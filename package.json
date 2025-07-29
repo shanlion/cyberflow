@@ -1,0 +1,54 @@
+{
+    "name": "cyberflow-extension",
+    "version": "1.0.0",
+    "description": "A powerful Chrome extension for enhanced browsing experience",
+    "main": "background.js",
+    "scripts": {
+        "dev": "vite --host 0.0.0.0 --force",
+        "build": "vite build --mode production",
+        "build:dev": "vite build --mode development",
+        "preview": "vite preview",
+        "clean": "rm -rf dist",
+        "package": "npm run build && cd dist && zip -r ../cyberflow-extension.zip . -x '*.DS_Store*' '*.log'",
+        "package:dev": "npm run build:dev && cd dist && zip -r ../cyberflow-extension-dev.zip . -x '*.DS_Store*' '*.log'",
+        "watch": "vite build --watch",
+        "lint": "echo 'Add linting tools here'",
+        "test": "echo 'No tests specified'"
+    },
+    "keywords": [
+        "chrome-extension",
+        "browser-extension",
+        "web-enhancement",
+        "productivity",
+        "page-analysis",
+        "screenshot",
+        "text-highlight"
+    ],
+    "author": "Your Name",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/your-username/cyberflow-extension.git"
+    },
+    "bugs": {
+        "url": "https://github.com/your-username/cyberflow-extension/issues"
+    },
+    "homepage": "https://github.com/your-username/cyberflow-extension#readme",
+    "devDependencies": {
+        "@crxjs/vite-plugin": "^2.0.3",
+        "@vitejs/plugin-vue": "^5.2.4",
+        "sass": "^1.89.2",
+        "vite": "^6.3.5"
+    },
+    "engines": {
+        "node": ">=14.0.0"
+    },
+    "dependencies": {
+        "@pureadmin/utils": "^2.6.2",
+        "axios": "^1.11.0",
+        "crypto-js": "^4.2.0",
+        "element-plus": "^2.10.4",
+        "jsencrypt": "^3.3.2",
+        "vue": "^3.5.18"
+    }
+}

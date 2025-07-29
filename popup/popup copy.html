@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cyberflow Extension</title>
+        <link rel="stylesheet" href="popup.css" />
+    </head>
+    <body>
+        <div class="popup-container">
+            <!-- Header -->
+            <header class="popup-header">
+                <img src="../icons/icon32.png" alt="Cyberflow" class="logo" />
+                <h1>Cyberflow</h1>
+                <div class="version">v1.0.0</div>
+            </header>
+
+            <!-- Main Content -->
+            <main class="popup-main">
+                <!-- Status Section -->
+                <section class="status-section">
+                    <div class="toggle-container">
+                        <label class="toggle">
+                            <input type="checkbox" id="enableToggle" checked />
+                            <span class="slider"></span>
+                        </label>
+                        <span class="toggle-label">启用扩展</span>
+                    </div>
+                    <div class="status-indicator">
+                        <span class="status-dot active"></span>
+                        <span class="status-text">运行中</span>
+                    </div>
+                </section>
+
+                <!-- Features Section -->
+                <section class="features-section">
+                    <h3>功能</h3>
+                    <div class="feature-grid">
+                        <button class="feature-btn" id="pageInfoBtn">
+                            <span class="feature-icon">📊</span>
+                            <span class="feature-text">页面信息</span>
+                        </button>
+                        <button class="feature-btn" id="highlightBtn">
+                            <span class="feature-icon">🔍</span>
+                            <span class="feature-text">文本高亮</span>
+                        </button>
+                        <button class="feature-btn" id="screenshotBtn">
+                            <span class="feature-icon">📸</span>
+                            <span class="feature-text">截图</span>
+                        </button>
+                        <button class="feature-btn" id="settingsBtn">
+                            <span class="feature-icon">⚙️</span>
+                            <span class="feature-text">设置</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Quick Actions -->
+                <section class="actions-section">
+                    <h3>快速操作</h3>
+                    <div class="action-buttons">
+                        <button class="action-btn primary" id="analyzeBtn">
+                            分析页面
+                        </button>
+                        <button class="action-btn secondary" id="exportBtn">
+                            导出数据
+                        </button>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Footer -->
+            <footer class="popup-footer">
+                <div class="footer-links">
+                    <a href="#" id="helpLink">帮助</a>
+                    <a href="#" id="feedbackLink">反馈</a>
+                </div>
+            </footer>
+        </div>
+
+        <!-- Loading Overlay -->
+        <div class="loading-overlay" id="loadingOverlay">
+            <div class="loading-spinner"></div>
+            <div class="loading-text">处理中...</div>
+        </div>
+
+        <script src="popup.js"></script>
+    </body>
+</html>

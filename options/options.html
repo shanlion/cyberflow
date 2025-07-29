@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Cyberflow Extension - 设置</title>
+        <link rel="stylesheet" href="options.css" />
+    </head>
+    <body>
+        <div class="options-container">
+            <!-- Header -->
+            <header class="options-header">
+                <div class="header-content">
+                    <img
+                        src="../icons/icon48.png"
+                        alt="Cyberflow"
+                        class="logo"
+                    />
+                    <div class="header-text">
+                        <h1>Cyberflow Extension</h1>
+                        <p>自定义您的浏览体验</p>
+                    </div>
+                </div>
+            </header>
+
+            <!-- Navigation -->
+            <nav class="options-nav">
+                <button class="nav-btn active" data-section="general">
+                    <span class="nav-icon">⚙️</span>
+                    常规设置
+                </button>
+                <button class="nav-btn" data-section="features">
+                    <span class="nav-icon">🔧</span>
+                    功能配置
+                </button>
+                <button class="nav-btn" data-section="appearance">
+                    <span class="nav-icon">🎨</span>
+                    外观设置
+                </button>
+                <button class="nav-btn" data-section="advanced">
+                    <span class="nav-icon">🔬</span>
+                    高级选项
+                </button>
+                <button class="nav-btn" data-section="about">
+                    <span class="nav-icon">ℹ️</span>
+                    关于
+                </button>
+            </nav>
+
+            <!-- Main Content -->
+            <main class="options-main">
+                <!-- General Settings -->
+                <section id="general" class="settings-section active">
+                    <h2>常规设置</h2>
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>启用扩展</h3>
+                                <p>控制扩展的全局开关</p>
+                            </div>
+                            <label class="toggle">
+                                <input
+                                    type="checkbox"
+                                    id="globalEnable"
+                                    checked
+                                />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>自动更新</h3>
+                                <p>自动检查并安装更新</p>
+                            </div>
+                            <label class="toggle">
+                                <input
+                                    type="checkbox"
+                                    id="autoUpdate"
+                                    checked
+                                />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>通知</h3>
+                                <p>显示扩展相关通知</p>
+                            </div>
+                            <label class="toggle">
+                                <input
+                                    type="checkbox"
+                                    id="notifications"
+                                    checked
+                                />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Features Settings -->
+                <section id="features" class="settings-section">
+                    <h2>功能配置</h2>
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>页面分析</h3>
+                                <p>自动分析页面内容</p>
+                            </div>
+                            <label class="toggle">
+                                <input
+                                    type="checkbox"
+                                    id="pageAnalysis"
+                                    checked
+                                />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>文本高亮</h3>
+                                <p>启用文本高亮功能</p>
+                            </div>
+                            <label class="toggle">
+                                <input
+                                    type="checkbox"
+                                    id="textHighlight"
+                                    checked
+                                />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>快速截图</h3>
+                                <p>启用一键截图功能</p>
+                            </div>
+                            <label class="toggle">
+                                <input
+                                    type="checkbox"
+                                    id="quickScreenshot"
+                                    checked
+                                />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>数据导出</h3>
+                                <p>允许导出页面数据</p>
+                            </div>
+                            <label class="toggle">
+                                <input
+                                    type="checkbox"
+                                    id="dataExport"
+                                    checked
+                                />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Appearance Settings -->
+                <section id="appearance" class="settings-section">
+                    <h2>外观设置</h2>
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>主题</h3>
+                                <p>选择界面主题</p>
+                            </div>
+                            <select id="themeSelect" class="setting-select">
+                                <option value="light">浅色主题</option>
+                                <option value="dark">深色主题</option>
+                                <option value="auto">跟随系统</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>界面语言</h3>
+                                <p>选择界面显示语言</p>
+                            </div>
+                            <select id="languageSelect" class="setting-select">
+                                <option value="zh-CN">简体中文</option>
+                                <option value="en-US">English</option>
+                                <option value="ja-JP">日本語</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>动画效果</h3>
+                                <p>启用界面动画</p>
+                            </div>
+                            <label class="toggle">
+                                <input
+                                    type="checkbox"
+                                    id="animations"
+                                    checked
+                                />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Advanced Settings -->
+                <section id="advanced" class="settings-section">
+                    <h2>高级选项</h2>
+                    <div class="settings-group">
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>调试模式</h3>
+                                <p>启用调试模式（开发者选项）</p>
+                            </div>
+                            <label class="toggle">
+                                <input type="checkbox" id="debugMode" />
+                                <span class="slider"></span>
+                            </label>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>缓存大小</h3>
+                                <p>设置本地缓存大小限制（MB）</p>
+                            </div>
+                            <input
+                                type="range"
+                                id="cacheSize"
+                                min="10"
+                                max="100"
+                                value="50"
+                                class="setting-range"
+                            />
+                            <span class="range-value">50 MB</span>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>数据清理</h3>
+                                <p>清除所有扩展数据</p>
+                            </div>
+                            <button class="danger-btn" id="clearDataBtn">
+                                清除数据
+                            </button>
+                        </div>
+
+                        <div class="setting-item">
+                            <div class="setting-label">
+                                <h3>重置设置</h3>
+                                <p>恢复所有设置到默认值</p>
+                            </div>
+                            <button class="danger-btn" id="resetBtn">
+                                重置设置
+                            </button>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- About Section -->
+                <section id="about" class="settings-section">
+                    <h2>关于</h2>
+                    <div class="about-content">
+                        <div class="about-info">
+                            <h3>Cyberflow Extension</h3>
+                            <p class="version">版本 1.0.0</p>
+                            <p class="description">
+                                一个强大的Chrome扩展，为您提供增强的浏览体验。
+                                包含页面分析、文本高亮、快速截图等实用功能。
+                            </p>
+                        </div>
+
+                        <div class="about-links">
+                            <a href="#" class="link-btn" id="homepageLink">
+                                <span class="link-icon">🏠</span>
+                                项目主页
+                            </a>
+                            <a href="#" class="link-btn" id="documentationLink">
+                                <span class="link-icon">📚</span>
+                                使用文档
+                            </a>
+                            <a href="#" class="link-btn" id="issuesLink">
+                                <span class="link-icon">🐛</span>
+                                报告问题
+                            </a>
+                            <a href="#" class="link-btn" id="changelogLink">
+                                <span class="link-icon">📋</span>
+                                更新日志
+                            </a>
+                        </div>
+
+                        <div class="about-footer">
+                            <p>
+                                &copy; 2024 Cyberflow Extension. All rights
+                                reserved.
+                            </p>
+                        </div>
+                    </div>
+                </section>
+            </main>
+
+            <!-- Save Status -->
+            <div class="save-status" id="saveStatus">
+                <span class="save-icon">✓</span>
+                <span class="save-text">设置已保存</span>
+            </div>
+        </div>
+
+        <script src="options.js"></script>
+    </body>
+</html>
