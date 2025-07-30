@@ -1,5 +1,5 @@
 <template>
-    <div class="popup_wrapper" v-loading="loading">
+    <div class="popup_wrapper">
         <Login v-if="showPage == 'login'" ref="logoRef" @submit="onLogin" />
         <WorkFlow v-if="showPage == 'workflow'" @submit="onStartWork" />
         <Permission v-if="showPage == 'permission'" @submit="onTwitter" />
@@ -31,6 +31,15 @@ onMounted(() => {
             showPage.value = "login";
         }
         loading.value = false;
+    });
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        // 监听推特是否登录
+        if (request.action === "getLoginStatus") {
+            let {value, login} = request.data
+            if (value === 'twitter' && login) {
+                showPage.value = "worklog";
+            }
+        }
     });
 });
 const loading = ref(true);
@@ -78,12 +87,23 @@ const onLogin = (name, pass) => {
             logoRef.value?.clearInputs();
         });
 };
-
+const sendTwitterData = () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        chrome.tabs.sendMessage(tabs.id, { 
+            action: "sendTwitter", 
+            data: {url: 'xxxx'} 
+        }, (response) => {
+            console.log("Twitter回复:", response);
+        });
+    });
+}
 const onStartWork = (id) => {
     console.log(id);
 };
 
-const onTwitter = () => {};
+const onTwitter = () => {
+    chrome.runtime.sendMessage({ action: "loginTwitter" });
+};
 </script>
 
 <style scoped lang="scss">

@@ -24,6 +24,12 @@
                 "content.js"
             ],
             "css": []
+        },
+        {
+            "matches": ["*://x.com/*"],
+            "js": ["content.js", "content_scripts/twitter.js"],
+            "run_at": "document_idle",
+            "type": "module"
         }
     ],
     "action": {
