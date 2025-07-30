@@ -1,6 +1,8 @@
 import axios from "axios";
 
-const baseURL = import.meta.env.VUE_APP_API_BASE_URL;
+const baseURL = import.meta.env.VITE_API_BASE_URL;
+
+console.log("baseURLbaseURLbaseURLbaseURL", baseURL, import.meta.env);
 // 创建axios实例
 const apiClient = axios.create({
     baseURL: baseURL,

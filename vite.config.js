@@ -19,9 +19,11 @@ export default defineConfig({
                 content: resolve(__dirname, "content.js"),
                 popup: resolve(__dirname, "popup/popup.html"),
                 options: resolve(__dirname, "options/options.html")
+                // 如果有单独的Vue组件作为入口
+                // workflow: resolve(__dirname, "src/components/WorkFlow.vue"),
             },
             output: {
-                // 保持原始文件名
+                // 保持原始文件名并放在对应目录
                 entryFileNames: (chunkInfo) => {
                     const facadeModuleId = chunkInfo.facadeModuleId;
                     if (facadeModuleId.includes("background.js")) {
@@ -30,11 +32,28 @@ export default defineConfig({
                     if (facadeModuleId.includes("content.js")) {
                         return "content.js";
                     }
+                    if (facadeModuleId.includes("popup/popup.html")) {
+                        return "popup/popup.js";
+                    }
+                    if (facadeModuleId.includes("options/options.html")) {
+                        return "options/options.js";
+                    }
                     return "[name].js";
                 },
-                chunkFileNames: "[name].js",
+                chunkFileNames: (chunkInfo) => {
+                    // 根据chunk的来源决定输出目录
+                    const facadeModuleId = chunkInfo.facadeModuleId;
+                    if (facadeModuleId && facadeModuleId.includes("popup/")) {
+                        return "popup/[name].js";
+                    }
+                    if (facadeModuleId && facadeModuleId.includes("options/")) {
+                        return "options/[name].js";
+                    }
+                    return "[name].js";
+                },
                 assetFileNames: (assetInfo) => {
                     // CSS文件保持在对应目录
+                    console.log("Asset Info:", assetInfo);
                     if (assetInfo.name.endsWith(".css")) {
                         if (assetInfo.name.includes("popup")) {
                             return "popup/[name][extname]";
@@ -45,6 +64,12 @@ export default defineConfig({
                         if (assetInfo.name.includes("content")) {
                             return "styles/[name][extname]";
                         }
+                        // 默认CSS文件放在styles目录
+                        return "styles/[name][extname]";
+                    }
+                    // 图片等静态资源
+                    if (assetInfo.name.match(/\.(png|jpg|jpeg|gif|svg|ico)$/)) {
+                        return "icons/[name][extname]";
                     }
                     // 其他资源文件
                     return "assets/[name][extname]";
@@ -70,20 +95,74 @@ export default defineConfig({
     // 路径解析
     resolve: {
         alias: {
-            "@": resolve(__dirname, "."),
+            "@": resolve(__dirname, "src"),
+            "@src": resolve(__dirname, "src"),
             "@popup": resolve(__dirname, "popup"),
             "@options": resolve(__dirname, "options"),
             "@styles": resolve(__dirname, "styles"),
             "@assets": resolve(__dirname, "assets"),
-            "@icons": resolve(__dirname, "icons")
+            "@icons": resolve(__dirname, "icons"),
+            "@components": resolve(__dirname, "src/components"),
+            "@api": resolve(__dirname, "src/api"),
+            "@types": resolve(__dirname, "src/types")
         }
     },
 
     // 插件配置
     plugins: [
-        // 自定义插件：处理Chrome扩展特殊需求
+        // Vue插件
         vue(),
 
+        // 自定义插件：处理HTML中的相对路径
+        {
+            name: "fix-html-paths",
+            writeBundle(options, bundle) {
+                const fs = require("fs");
+                const path = require("path");
+
+                // 修复popup.html中的路径
+                const popupHtmlPath = path.join(
+                    options.dir,
+                    "popup",
+                    "popup.html"
+                );
+                if (fs.existsSync(popupHtmlPath)) {
+                    let content = fs.readFileSync(popupHtmlPath, "utf-8");
+                    content = content.replace(
+                        /src="popup\/popup\.js"/g,
+                        'src="./popup.js"'
+                    );
+                    content = content.replace(
+                        /href="popup\/popup\.css"/g,
+                        'href="./popup.css"'
+                    );
+                    fs.writeFileSync(popupHtmlPath, content);
+                    console.log("✅ Fixed popup.html paths");
+                }
+
+                // 修复options.html中的路径
+                const optionsHtmlPath = path.join(
+                    options.dir,
+                    "options",
+                    "options.html"
+                );
+                if (fs.existsSync(optionsHtmlPath)) {
+                    let content = fs.readFileSync(optionsHtmlPath, "utf-8");
+                    content = content.replace(
+                        /src="options\/options\.js"/g,
+                        'src="./options.js"'
+                    );
+                    content = content.replace(
+                        /href="options\/options\.css"/g,
+                        'href="./options.css"'
+                    );
+                    fs.writeFileSync(optionsHtmlPath, content);
+                    console.log("✅ Fixed options.html paths");
+                }
+            }
+        },
+
+        // Chrome扩展构建插件
         {
             name: "chrome-extension",
             buildStart() {
@@ -96,7 +175,9 @@ export default defineConfig({
                     "dist/options",
                     "dist/styles",
                     "dist/icons",
-                    "dist/assets"
+                    "dist/assets",
+                    "dist/src",
+                    "dist/src/components"
                 ];
                 dirs.forEach((dir) => {
                     if (!existsSync(dir)) {

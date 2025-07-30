@@ -23,9 +23,7 @@
             "js": [
                 "content.js"
             ],
-            "css": [
-                "styles/content.css"
-            ]
+            "css": []
         }
     ],
     "action": {

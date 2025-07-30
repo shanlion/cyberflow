@@ -92,7 +92,7 @@ defineExpose({
     display: flex;
     align-items: center;
     flex-direction: column;
-    justify-content: center;
+    justify-content: start;
     padding-inline: 74px;
     width: calc(100% - 148px);
     height: 100%;
