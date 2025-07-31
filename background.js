@@ -24,6 +24,12 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         case "startWork":
             startWork(sendResponse);
             return true; // Keep message channel open for async response
+        case "toggleFeature":
+            handleToggleFeature(request.data, sendResponse);
+            return true;
+        case "loginTwitter":
+            handleLoginTwitter(sender, sendResponse);
+            return true;
         default:
             console.log("Unknown action:", request.action);
     }
@@ -88,3 +94,17 @@ async function handleWork() {
 //         });
 //     });
 // }
+function handleLoginTwitter(tab, sendResponse) {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        if (tabs[0]) {
+            chrome.tabs.update(tabs[0].id, { url: "https://x.com/" });
+        } else {
+            chrome.tabs.create({ url: "https://x.com/" });
+        }
+    });
+    sendResponse({ success: true });
+}
+// Handle extension context menu (if needed)
+// chrome.contextMenus.onClicked.addListener((info, tab) => {
+//     console.log("Context menu clicked:", info);
+// });

@@ -1,5 +1,5 @@
 <template>
-    <div class="popup_wrapper" v-loading="loading">
+    <div class="popup_wrapper">
         <Login v-if="showPage == 'login'" ref="logoRef" @submit="onLogin" />
         <WorkFlow
             v-if="showPage == 'workflow'"
@@ -42,6 +42,15 @@ onMounted(() => {
                 showPage.value = page || "workflow";
                 loading.value = false;
             });
+        }
+    });
+    chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
+        // 监听推特是否登录
+        if (request.action === "getLoginStatus") {
+            let { value, login } = request.data;
+            if (value === "twitter" && login) {
+                showPage.value = "worklog";
+            }
         }
     });
 });
