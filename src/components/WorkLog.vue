@@ -1,30 +1,35 @@
 <template>
-    <div class="logs_wrapper">
+    <div class="logs_wrapper" v-loading="loading">
         <div class="title_head">
             <div class="title">
                 当前工作流：{{ workflowName }}
-                <span class="change_wrap">切换工作流</span>
+                <span class="change_wrap" @click="emit('changeWorkflow')"
+                    >切换工作流</span
+                >
             </div>
-            <div class="logout_btn">登出</div>
+            <div class="logout_btn" @click="emit('logout')">登出</div>
         </div>
         <el-table
             class="log_table"
             :data="tableData"
-            height="552"
+            height="452"
             style="background: unset; border-radius: 8px 8px 0 0"
         >
-            <el-table-column prop="date" label="发Twitter账号" width="110">
+            <el-table-column label="发Twitter账号" width="110">
+                <template #default="scope">
+                    {{ workflowName }}
+                </template>
             </el-table-column>
             <el-table-column prop="article" label="发Twitter内容" width="187">
                 <template #default="scope">
-                    <el-tooltip
+                    <!-- <el-tooltip
                         class="box-item"
                         effect="dark"
                         :content="scope.row.article"
                         placement="top-start"
-                    >
-                        {{ scope.row.article }}
-                    </el-tooltip>
+                    > -->
+                    <div class="article" v-html="scope.row.id"></div>
+                    <!-- </el-tooltip> -->
                 </template>
             </el-table-column>
             <el-table-column prop="updateTime" label="时间" width="100">
@@ -37,34 +42,84 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination background layout="prev, pager, next" :total="1000" />
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            @prev-click="prevPage"
+            @next-click="nextPage"
+            @update:current-page=""
+            :current-page="pageNum"
+            :total="total"
+            :page-size="pageSize"
+            v-if="total > 0"
+        />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, type Ref } from "vue";
+import { ref, computed, type Ref, defineEmits } from "vue";
 import { onMounted } from "vue";
-import { missionApi } from "../api/api.js";
-const loading = ref(true);
-const tableData = ref([]);
-const props = defineProps({
-    workflowId: String,
+import { selfLocalStorage } from "../popup/storage.js";
+import { workflowApi } from "../api/api";
+const emit = defineEmits(["logout", "changeWorkflow"]);
+const pageSize = 1;
+const pageNum = ref(1);
+const total = ref(0);
+const loading = ref(false);
+const tableData = ref([
+    {
+        date: "2023-10-01",
+        name: "账号1",
+        address: "发Twitter内容1",
+        status: "成功"
+    },
+    {
+        date: "2023-10-02",
+        name: "账号2",
+        address: "发Twitter内容2",
+        status: "失败"
+    }
+]);
+onMounted(async () => {
+    loading.value = true;
+    let workflow = await selfLocalStorage.getItem("workflow");
+    workflowName.value = JSON.parse(workflow)?.workflowName || "";
+    pageNum.value = 1;
+    tableData.value = [];
+    getTasks();
+    //获取任务
 });
-onMounted(() => {
-    missionApi
-        .getMissionPage({workflowId: props.workflowId })
+
+const getTasks = async () => {
+    let workflow = await selfLocalStorage.getItem("workflow");
+    let workflowObj = JSON.parse(workflow);
+    workflowApi
+        .getTaskList(workflowObj.id, pageNum.value, pageSize)
         .then((response) => {
             console.log(response);
             tableData.value = response.data.rows || [];
-        })
-        .catch((error) => {
-            console.error("Error fetching missions:", error);
+            total.value = Number(response.data.total) || 0;
+            console.log("tableData", total.value);
         })
         .finally(() => {
             loading.value = false;
         });
-});
-const workflowName: Ref<string> = ref("工作流1");
+};
+const prevPage = () => {
+    loading.value = true;
+    if (pageNum.value > 1) {
+        pageNum.value--;
+        getTasks();
+    }
+};
+const nextPage = () => {
+    loading.value = true;
+    if (pageNum.value * pageSize < total.value) {
+        pageNum.value++;
+        getTasks();
+    }
+};
+const workflowName: Ref<string> = ref("");
 const stateText = (val: string | number) => {
     switch (val) {
         case 0:

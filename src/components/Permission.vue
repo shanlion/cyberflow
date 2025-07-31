@@ -8,7 +8,9 @@
         </div>
 
         <div class="submit_btn" @click="handleSubmit">
-            <div class="submit_text">一键授权插件“xcyber-ai”账号发twitter</div>
+            <div class="submit_text">
+                一键授权插件“{{ workflowName }}”账号发twitter
+            </div>
         </div>
     </div>
 </template>
@@ -17,8 +19,12 @@
 import { onMounted, ref, type Ref, defineEmits } from "vue";
 import LogoHead from "./LogoHead.vue";
 import Tips from "./Tips.vue";
-onMounted(() => {});
-
+import { selfLocalStorage } from "../popup/storage.js";
+onMounted(async () => {
+    let workflow = await selfLocalStorage.getItem("workflow");
+    workflowName.value = JSON.parse(workflow)?.accountName || "";
+});
+const workflowName = ref("");
 const emit = defineEmits(["submit"]);
 // 处理提交事件
 const handleSubmit = () => {

@@ -1,16 +1,24 @@
 <template>
     <div class="popup_wrapper">
         <Login v-if="showPage == 'login'" ref="logoRef" @submit="onLogin" />
-        <WorkFlow v-if="showPage == 'workflow'" @submit="onStartWork" />
+        <WorkFlow
+            v-if="showPage == 'workflow'"
+            @submit="onStartWork"
+            @changePage="onChangePage"
+        />
         <Permission v-if="showPage == 'permission'" @submit="onTwitter" />
-        <WorkLog v-if="showPage == 'worklog'" :workflowId="workflowId"/>
+        <WorkLog
+            v-if="showPage == 'worklog'"
+            @change-workflow="onChangeWorkflow"
+            @logout="onLogout"
+        />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, type Ref } from "vue";
+import { ref, computed, type Ref, watch } from "vue";
 import { onMounted } from "vue";
-
+import { getXAccountInfo } from "../../x";
 // Declare chrome for TypeScript
 declare const chrome: any;
 
@@ -20,30 +28,33 @@ import Permission from "../components/Permission.vue";
 import WorkLog from "../components/WorkLog.vue";
 
 import type { ComponentPublicInstance } from "vue";
-import { userApi } from "../api/api.js";
+import { userApi } from "../api/api";
 import { ElMessage } from "element-plus";
+import { selfLocalStorage } from "./storage.js";
 onMounted(() => {
     //判断应该展示哪个页面
-    chrome.storage.sync.get(["token", "page"], (result) => {
-        showPage.value = result.page || "";
-        loginToken.value = result.token || "";
-        if (!loginToken.value) {
+    selfLocalStorage.getItem("token").then((token) => {
+        if (!token) {
             showPage.value = "login";
+            loading.value = false;
+        } else {
+            selfLocalStorage.getItem("page").then((page) => {
+                showPage.value = page || "workflow";
+                loading.value = false;
+            });
         }
-        loading.value = false;
     });
     chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
         // 监听推特是否登录
         if (request.action === "getLoginStatus") {
-            let {value, login} = request.data
-            if (value === 'twitter' && login) {
+            let { value, login } = request.data;
+            if (value === "twitter" && login) {
                 showPage.value = "worklog";
             }
         }
     });
 });
 const loading = ref(true);
-const loginToken = ref("");
 const userData = ref(null);
 const showPage = ref(""); // 控制显示的页面
 const workflowId = ref("");
@@ -64,15 +75,12 @@ const onLogin = (name, pass) => {
                 message: "登录成功",
                 type: "success"
             });
-            localStorage.setItem("token", response.data.token);
-            showPage.value = "workflow";
-            chrome.storage.sync.set(
-                { token: response.data.token, page: "workflow" },
-                () => {
-                    //跳转工作流选择页面
-                    loading.value = false;
-                }
-            );
+            selfLocalStorage.setItem("token", response.data.token).then(() => {
+                console.log("Token saved to local storage");
+                showPage.value = "workflow";
+                loading.value = false;
+            });
+
             userData.value = response.data;
         })
         .catch((error) => {
@@ -88,28 +96,82 @@ const onLogin = (name, pass) => {
             logoRef.value?.clearInputs();
         });
 };
-const sendTwitterData = () => {
-    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
-        chrome.tabs.sendMessage(tabs.id, { 
-            action: "sendTwitter", 
-            data: {url: 'xxxx'} 
-        }, (response) => {
-            console.log("Twitter回复:", response);
+
+const onLogout = () => {
+    userApi
+        .logout()
+        .then(() => {
+            console.log("Logout successful");
+            ElMessage({
+                message: "登出成功",
+                type: "success"
+            });
+            selfLocalStorage.removeItem("token").then(() => {
+                console.log("Token removed from local storage");
+                showPage.value = "login";
+            });
+        })
+        .catch((error) => {
+            console.error("Error during logout:", error);
+            ElMessage({
+                message: "登出失败",
+                type: "error"
+            });
         });
-    });
-}
-const onStartWork = (id) => {
-    console.log(id);
-    showPage.value = "worklog";
-    workflowId.value = id;
-    // chrome.storage.sync.set(
-    //     { page: "worklog" },
-    // );
 };
 
-const onTwitter = () => {
-    chrome.runtime.sendMessage({ action: "loginTwitter" });
+const onChangeWorkflow = () => {
+    showPage.value = "workflow";
+    // 清除工作流数据
+    selfLocalStorage.removeItem("workflow").then(() => {
+        console.log("Workflow removed from local storage");
+    });
 };
+const onStartWork = (workflow) => {
+    console.log(workflow);
+    selfLocalStorage.setItem("workflow", JSON.stringify(workflow)).then(() => {
+        console.log("Workflow saved to local storage");
+    });
+    //接口检测是否登录的推特账号正确
+    checkTwitterLogin(workflow);
+};
+const checkTwitterLogin = async (workflow) => {
+    loading.value = true;
+    let currentTwitterInfo = await getXAccountInfo();
+    console.log("当前推特账号信息:", currentTwitterInfo);
+    if (currentTwitterInfo.accountId == workflow.accountName || true) {
+        showPage.value = "worklog";
+    } else {
+        showPage.value = "permission";
+    }
+    loading.value = false;
+    return true; // 假设检查通过
+};
+const onTwitter = async () => {
+    let workflow = await selfLocalStorage.getItem("workflow");
+    checkTwitterLogin(JSON.parse(workflow));
+    if (showPage.value == "permission") {
+        ElMessage({
+            message: `请在浏览器页面登录您的Twitter账号“${
+                JSON.parse(workflow).accountName
+            }”，然后点击一键授权即可。`,
+            type: "warning"
+        });
+    }
+};
+
+const onChangePage = (page: string) => {
+    showPage.value = page;
+    if (page === "login") {
+        selfLocalStorage.removeItem("workflow");
+        selfLocalStorage.removeItem("token");
+    }
+};
+
+watch(showPage, (newPage) => {
+    console.log("当前页面:", newPage);
+    selfLocalStorage.setItem("page", newPage);
+});
 </script>
 
 <style scoped lang="scss">
