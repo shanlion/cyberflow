@@ -33,8 +33,8 @@ import { rsaEncrypt } from "../../crypt";
 const emit = defineEmits(["submit"]);
 onMounted(() => {});
 
-const nameInput: Ref<string> = ref("");
-const passInput: Ref<string> = ref("");
+const nameInput: Ref<string> = ref("01cyberai@gmail.com");
+const passInput: Ref<string> = ref("woaiwanghong233~");
 const canSubmit = computed(() => {
     return nameInput.value.length > 0 && passInput.value.length > 0;
 });

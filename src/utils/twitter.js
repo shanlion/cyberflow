@@ -47,6 +47,21 @@ setInterval(() => {
   }
 }, 1000);
 
+async function mockTextInput(text) {
+  waitFor("div[contenteditable='true']").then(editor => {
+    const dom = document.createElement('div')
+    dom.innerHTML = text
+    let newText = dom.innerText
+    editor.focus();
+    const pasteEvent = new ClipboardEvent('paste', {
+      bubbles: true,
+      cancelable: true,
+      clipboardData: new DataTransfer(),
+    });
+    pasteEvent.clipboardData?.setData('text/plain', newText);
+    editor.dispatchEvent(pasteEvent);
+  })
+}
 
 async function mockInputVideo(url) {
   const buffer = await getBuffer(url);
@@ -76,7 +91,8 @@ async function handlePublishVideo() {
 chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
   if (request.action === "sendTwitter") {
     console.log("收到popup消息:", request.data);
-    mockInputVideo('https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4');
+    mockTextInput(request.data);
+    // mockInputVideo('https://interactive-examples.mdn.mozilla.net/media/cc0-videos/flower.mp4');
     // sendResponse("处理完成");
   }
 });

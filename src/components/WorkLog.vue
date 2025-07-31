@@ -61,25 +61,13 @@ import { ref, computed, type Ref, defineEmits } from "vue";
 import { onMounted } from "vue";
 import { selfLocalStorage } from "../popup/storage.js";
 import { workflowApi } from "../api/api";
+declare const chrome: any;
 const emit = defineEmits(["logout", "changeWorkflow"]);
 const pageSize = 1;
 const pageNum = ref(1);
 const total = ref(0);
 const loading = ref(false);
-const tableData = ref([
-    {
-        date: "2023-10-01",
-        name: "账号1",
-        address: "发Twitter内容1",
-        status: "成功"
-    },
-    {
-        date: "2023-10-02",
-        name: "账号2",
-        address: "发Twitter内容2",
-        status: "失败"
-    }
-]);
+const tableData = ref([]);
 onMounted(async () => {
     loading.value = true;
     let workflow = await selfLocalStorage.getItem("workflow");
@@ -100,11 +88,23 @@ const getTasks = async () => {
             tableData.value = response.data.rows || [];
             total.value = Number(response.data.total) || 0;
             console.log("tableData", total.value);
+            // sendTwitterData()
         })
         .finally(() => {
             loading.value = false;
         });
 };
+const sendTwitterData = () => {
+    chrome.tabs.query({ active: true, currentWindow: true }, (tabs) => {
+        tableData.value.forEach((item) => {
+            if (item.status === 0) {
+                chrome.tabs.sendMessage(tabs[0].id, { action: "sendTwitter", data: item }, (response) => {
+                    console.log("Twitter回复:", response);
+                });
+            }
+        });
+    });
+}
 const prevPage = () => {
     loading.value = true;
     if (pageNum.value > 1) {

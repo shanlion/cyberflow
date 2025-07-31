@@ -139,7 +139,7 @@ const checkTwitterLogin = async (workflow) => {
     loading.value = true;
     let currentTwitterInfo = await getXAccountInfo();
     console.log("当前推特账号信息:", currentTwitterInfo);
-    if (currentTwitterInfo.accountId == workflow.accountName || true) {
+    if (currentTwitterInfo?.accountId == workflow.accountName || true) {
         showPage.value = "worklog";
     } else {
         showPage.value = "permission";
