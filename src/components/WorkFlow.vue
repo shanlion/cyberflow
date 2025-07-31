@@ -3,7 +3,7 @@
         <LogoHead class="logo_head" />
         <div class="title">选择工作流</div>
         <div class="raidos_wrap">
-            <el-radio-group v-model="workSelectId">
+            <el-radio-group v-model="workSelectId" v-if="workflows.length > 0">
                 <el-radio
                     v-for="workflow in workflows"
                     :key="workflow.id"
@@ -13,6 +13,8 @@
                     {{ `${workflow.workflowName} ${workflow.accountName}` }}
                 </el-radio>
             </el-radio-group>
+
+            <div v-if="workflows.length === 0">请先创建工作流</div>
         </div>
 
         <div class="submit_btn" @click="handleSubmit">
@@ -25,39 +27,62 @@
 import { onMounted, ref, type Ref, defineEmits } from "vue";
 import LogoHead from "./LogoHead.vue";
 import type { WorkFlowData } from "../types/workflow";
-import { workflowApi } from "../api/api.js";
+import { workflowApi } from "../api/api";
+import { ElMessage } from "element-plus";
+
 onMounted(() => {
     loading.value = true;
     workflowApi
         .getWorkflows()
         .then((response) => {
-            workflows.value = response.data || [];
+            // debugger;
+            // response.data ||
+            workflows.value = response.data;
+            // [
+            //     {
+            //         id: 1,
+            //         workflowName: "默认工作流",
+            //         accountName: "账号1"
+            //     },
+            //     {
+            //         id: 2,
+            //         workflowName: "备用工作流",
+            //         accountName: "账号2"
+            //     }
+            // ];
+            workSelectId.value = workflows.value[0]?.id?.toString() || "";
         })
         .catch((error) => {
             console.error("Error fetching workflows:", error);
+
+            if (error.message.indexOf("用户未授权") !== -1) {
+                ElMessage.error("用户未授权，请先登录");
+                emit("changePage", "login");
+            } else {
+                ElMessage.error("获取工作流失败，请稍后重试");
+            }
         })
         .finally(() => {
             loading.value = false;
         });
 });
-const workflows = ref<WorkFlowData[]>([
-    {
-        id: 1,
-        workflowName: "工作流1",
-        accountName: "账号1"
-    },
-    {
-        id: 2,
-        workflowName:
-            "工作流2工作流2工作流2工作流2工作流2工作流2工作流2工作流2工作流2工作流2工作流2工作流2",
-        accountName: "账号2"
-    }
-]);
-const workSelectId: Ref<string> = ref("1");
-const emit = defineEmits(["submit"]);
+const workflows = ref<WorkFlowData[]>([]);
+const workSelectId: Ref<string> = ref("");
+const emit = defineEmits(["submit", "changePage"]);
 // 处理提交事件
 const handleSubmit = () => {
-    emit("submit", workSelectId.value);
+    if (workflows.value.length === 0) {
+        ElMessage.warning("请先创建工作流");
+        return;
+    }
+    if (!workSelectId.value) {
+        ElMessage.warning("请选择工作流");
+        return;
+    }
+    let selectWorkflow = workflows.value.find(
+        (item) => item.id?.toString() == workSelectId.value
+    );
+    emit("submit", selectWorkflow);
 };
 const loading = ref(false);
 </script>

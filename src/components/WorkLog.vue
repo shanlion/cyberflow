@@ -3,14 +3,16 @@
         <div class="title_head">
             <div class="title">
                 当前工作流：{{ workflowName }}
-                <span class="change_wrap">切换工作流</span>
+                <span class="change_wrap" @click="emit('changeWorkflow')"
+                    >切换工作流</span
+                >
             </div>
-            <div class="logout_btn">登出</div>
+            <div class="logout_btn" @click="emit('logout')">登出</div>
         </div>
         <el-table
             class="log_table"
             :data="tableData"
-            height="552"
+            height="452"
             style="background: unset; border-radius: 8px 8px 0 0"
         >
             <el-table-column prop="date" label="发Twitter账号" width="110">
@@ -37,13 +39,24 @@
                 </template>
             </el-table-column>
         </el-table>
-        <el-pagination background layout="prev, pager, next" :total="1000" />
+        <el-pagination
+            background
+            layout="prev, pager, next"
+            :total="total"
+            v-if="total > 0"
+        />
     </div>
 </template>
 
 <script lang="ts" setup>
-import { ref, computed, type Ref } from "vue";
+import { ref, computed, type Ref, defineEmits } from "vue";
 import { onMounted } from "vue";
+import { selfLocalStorage } from "../popup/storage.js";
+import { workflowApi } from "../api/api";
+const emit = defineEmits(["logout", "changeWorkflow"]);
+const pageSize = 20;
+const pageNum = ref(1);
+const total = ref(0);
 const tableData = ref([
     {
         date: "2023-10-01",
@@ -58,8 +71,25 @@ const tableData = ref([
         status: "失败"
     }
 ]);
-onMounted(() => {});
-const workflowName: Ref<string> = ref("工作流1");
+onMounted(async () => {
+    let workflow = await selfLocalStorage.getItem("workflow");
+    workflowName.value = JSON.parse(workflow)?.workflowName || "";
+    pageNum.value = 1;
+    tableData.value = [];
+    getTasks();
+    //获取任务
+});
+
+const getTasks = async () => {
+    let workflow = await selfLocalStorage.getItem("workflow");
+    let workflowObj = JSON.parse(workflow);
+    workflowApi
+        .getTaskList(workflowObj.id, pageNum.value, pageSize)
+        .then((response) => {
+            console.log(response);
+        });
+};
+const workflowName: Ref<string> = ref("");
 const stateText = (val: string | number) => {
     switch (val) {
         case 0:

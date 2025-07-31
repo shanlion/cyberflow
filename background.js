@@ -7,12 +7,12 @@ console.log("Cyberflow Extension background script loaded");
 chrome.runtime.onInstalled.addListener((details) => {
     console.log("Extension installed:", details);
 
-    // Set default settings
-    chrome.storage.sync.set({
-        enabled: true,
-        theme: "light",
-        notifications: true
-    });
+    // // Set default settings
+    // chrome.storage.sync.set({
+    //     enabled: true,
+    //     theme: "light",
+    //     notifications: true
+    // });
 });
 
 // Handle messages from content scripts and popup
@@ -33,40 +33,27 @@ chrome.runtime.onMessage.addListener((request, sender, sendResponse) => {
     }
 });
 
-// Handle tab updates
-chrome.tabs.onUpdated.addListener((tabId, changeInfo, tab) => {
-    if (changeInfo.status === "complete" && tab.url) {
-        console.log("Tab updated:", tab.url);
-        // Perform actions when page is fully loaded
-    }
-});
+// // Helper functions
+// function handleGetTabInfo(tab, sendResponse) {
+//     if (tab) {
+//         sendResponse({
+//             success: true,
+//             data: {
+//                 url: tab.url,
+//                 title: tab.title,
+//                 id: tab.id
+//             }
+//         });
+//     } else {
+//         sendResponse({ success: false, error: "No tab information available" });
+//     }
+// }
 
-// Helper functions
-function handleGetTabInfo(tab, sendResponse) {
-    if (tab) {
-        sendResponse({
-            success: true,
-            data: {
-                url: tab.url,
-                title: tab.title,
-                id: tab.id
-            }
-        });
-    } else {
-        sendResponse({ success: false, error: "No tab information available" });
-    }
-}
-
-function handleToggleFeature(data, sendResponse) {
-    chrome.storage.sync.get(["enabled"], (result) => {
-        const newState = !result.enabled;
-        chrome.storage.sync.set({ enabled: newState }, () => {
-            sendResponse({ success: true, enabled: newState });
-        });
-    });
-}
-
-// Handle extension context menu (if needed)
-// chrome.contextMenus.onClicked.addListener((info, tab) => {
-//     console.log("Context menu clicked:", info);
-// });
+// function handleToggleFeature(data, sendResponse) {
+//     chrome.storage.sync.get(["enabled"], (result) => {
+//         const newState = !result.enabled;
+//         chrome.storage.sync.set({ enabled: newState }, () => {
+//             sendResponse({ success: true, enabled: newState });
+//         });
+//     });
+// }
