@@ -3,7 +3,7 @@
         <Login v-if="showPage == 'login'" ref="logoRef" @submit="onLogin" />
         <WorkFlow v-if="showPage == 'workflow'" @submit="onStartWork" />
         <Permission v-if="showPage == 'permission'" @submit="onTwitter" />
-        <WorkLog v-if="showPage == 'worklog'" />
+        <WorkLog v-if="showPage == 'worklog'" :workflowId="workflowId"/>
     </div>
 </template>
 
@@ -46,6 +46,7 @@ const loading = ref(true);
 const loginToken = ref("");
 const userData = ref(null);
 const showPage = ref(""); // 控制显示的页面
+const workflowId = ref("");
 // Use the correct type for the Login component instance
 const logoRef = ref<ComponentPublicInstance<{
     clearInputs: () => void;
@@ -99,6 +100,11 @@ const sendTwitterData = () => {
 }
 const onStartWork = (id) => {
     console.log(id);
+    showPage.value = "worklog";
+    workflowId.value = id;
+    // chrome.storage.sync.set(
+    //     { page: "worklog" },
+    // );
 };
 
 const onTwitter = () => {

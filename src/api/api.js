@@ -243,5 +243,14 @@ export const userApi = {
     }
 };
 
+/**
+ * 工作流相关API
+ */
+export const missionApi = {
+    getMissionPage: (params) => {
+        return request.get("api/cyberflow/mission/page", params);
+    },
+};
+
 // 默认导出request对象
 export default request;

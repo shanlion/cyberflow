@@ -15,21 +15,21 @@
         >
             <el-table-column prop="date" label="发Twitter账号" width="110">
             </el-table-column>
-            <el-table-column prop="name" label="发Twitter内容" width="187">
+            <el-table-column prop="article" label="发Twitter内容" width="187">
                 <template #default="scope">
                     <el-tooltip
                         class="box-item"
                         effect="dark"
-                        :content="scope.row.name"
+                        :content="scope.row.article"
                         placement="top-start"
                     >
-                        {{ scope.row.name }}
+                        {{ scope.row.article }}
                     </el-tooltip>
                 </template>
             </el-table-column>
-            <el-table-column prop="address" label="时间" width="100">
+            <el-table-column prop="updateTime" label="时间" width="100">
             </el-table-column>
-            <el-table-column prop="address" label="状态" width="60">
+            <el-table-column prop="status" label="状态" width="60">
                 <template #default="scope">
                     <el-tag :type="stateType(scope.row.status)">{{
                         stateText(scope.row.status)
@@ -44,21 +44,26 @@
 <script lang="ts" setup>
 import { ref, computed, type Ref } from "vue";
 import { onMounted } from "vue";
-const tableData = ref([
-    {
-        date: "2023-10-01",
-        name: "账号1",
-        address: "发Twitter内容1",
-        status: "成功"
-    },
-    {
-        date: "2023-10-02",
-        name: "账号2",
-        address: "发Twitter内容2",
-        status: "失败"
-    }
-]);
-onMounted(() => {});
+import { missionApi } from "../api/api.js";
+const loading = ref(true);
+const tableData = ref([]);
+const props = defineProps({
+    workflowId: String,
+});
+onMounted(() => {
+    missionApi
+        .getMissionPage({workflowId: props.workflowId })
+        .then((response) => {
+            console.log(response);
+            tableData.value = response.data.rows || [];
+        })
+        .catch((error) => {
+            console.error("Error fetching missions:", error);
+        })
+        .finally(() => {
+            loading.value = false;
+        });
+});
 const workflowName: Ref<string> = ref("工作流1");
 const stateText = (val: string | number) => {
     switch (val) {
