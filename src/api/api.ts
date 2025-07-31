@@ -322,6 +322,18 @@ export const workflowApi = {
             pageNum: pageNum,
             pageSize: pageSize
         });
+    },
+
+    getNeedPushList: (workflowId: number): Promise<ApiResponse<any[]>> => {
+        return request.get<any[]>(`/api/cyberflow/plugin/mission/get-mission`, {
+            workflowId: workflowId
+        });
+    },
+
+    finishedTask: (missionId: number): Promise<ApiResponse<any>> => {
+        return request.post<any>(`/api/cyberflow/plugin/mission/finished`, {
+            missionId: missionId
+        });
     }
 };
 
