@@ -233,6 +233,7 @@ export default defineConfig({
                     }
 
                     copyDir("assets", "dist/assets");
+                    copyDir("src/utils", "dist/content_scripts");
                 } catch (error) {
                     console.warn(
                         "⚠️ Could not copy assets directory:",
